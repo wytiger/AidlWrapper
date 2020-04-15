@@ -62,7 +62,7 @@ public class HelloServerManager {
         this.context = context.getApplicationContext();
 
         Future<IHelloServer> helloServerFuture = executorService.submit(callable);
-        executorService.shutdown();
+//        executorService.shutdown();
 
         return helloServerFuture.get();//阻塞等待结果
     }
