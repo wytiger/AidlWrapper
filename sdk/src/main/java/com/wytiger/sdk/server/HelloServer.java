@@ -13,6 +13,6 @@ import com.wytiger.sdk.IHelloServer;
 public class HelloServer extends IHelloServer.Stub {
     @Override
     public void sayHello() throws RemoteException {
-        Log.d("Server","HelloServer: hello");
+        Log.d("TAG","HelloServer: hello");
     }
 }

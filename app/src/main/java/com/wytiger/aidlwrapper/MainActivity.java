@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        HelloServerManager.getInstance().bindService(MainActivity.this);
+        HelloServerManager.getInstance().init(MainActivity.this);
 
         findViewById(R.id.btn_get).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -28,11 +28,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void testCallServer() {
-        try {
-            IHelloServer helloServer = HelloServerManager.getInstance().getHelloServer(MainActivity.this);
-            helloServer.sayHello();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    IHelloServer helloServer = HelloServerManager.getInstance().getHelloServer(MainActivity.this);
+                    helloServer.sayHello();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }

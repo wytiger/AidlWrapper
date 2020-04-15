@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.wytiger.sdk.IHelloServer;
 import com.wytiger.sdk.server.HelloServerService;
@@ -31,12 +32,7 @@ public class HelloServerManager {
     IHelloServer helloServer;
 
     private HelloServerManager() {
-        executorService = Executors.newSingleThreadExecutor(new ThreadFactory() {
-            @Override
-            public Thread newThread(Runnable r) {
-                return new Thread("server-manager-thread");
-            }
-        });
+        executorService = Executors.newSingleThreadExecutor();
         callable = new FetchHelloServerCallable();
     }
 
@@ -44,18 +40,37 @@ public class HelloServerManager {
         return INSTANCE;
     }
 
+    /**
+     * 初始化，绑定服务
+     *
+     * @param context 上下文
+     */
+    public void init(Context context) {
+        this.context = context.getApplicationContext();
+        bindService(context);
+    }
+
+    /**
+     * 获取服务，可能是耗时任务
+     *
+     * @param context 上下文
+     * @return
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
     public IHelloServer getHelloServer(Context context) throws ExecutionException, InterruptedException {
         this.context = context.getApplicationContext();
 
         Future<IHelloServer> helloServerFuture = executorService.submit(callable);
         executorService.shutdown();
 
-        return helloServerFuture.get();
+        return helloServerFuture.get();//阻塞等待结果
     }
 
     public class FetchHelloServerCallable implements Callable<IHelloServer> {
         @Override
         public IHelloServer call() throws Exception {
+            Log.d("TAG", "call");
             if (helloServer == null) {
                 synchronized (LOCK) {
                     //绑定服务
@@ -69,7 +84,7 @@ public class HelloServerManager {
         }
     }
 
-    public void bindService(Context context) {
+    private synchronized void bindService(Context context) {
         Intent intent = new Intent(context, HelloServerService.class);
         context.bindService(intent, new ServiceConnection() {
             @Override
