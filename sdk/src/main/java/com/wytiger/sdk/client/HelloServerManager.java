@@ -53,12 +53,11 @@ public class HelloServerManager {
     /**
      * 获取服务，可能是耗时任务
      *
-     * @param context 上下文
      * @return
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public IHelloServer getHelloServer(Context context) throws ExecutionException, InterruptedException {
+    public IHelloServer getHelloServer() throws ExecutionException, InterruptedException {
         this.context = context.getApplicationContext();
 
         Future<IHelloServer> helloServerFuture = executorService.submit(callable);
